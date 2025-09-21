@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "dih",
+    "project_name": "Great Planes",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -635,8 +635,8 @@
       }
     },
     "upload_options": {
-      "description": "in the vih",
-      "icon": "pizza",
+      "description": "The planes are great",
+      "icon": "ufo",
       "after": "none"
     },
     "use_early_access": false

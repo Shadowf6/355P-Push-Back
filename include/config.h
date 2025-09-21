@@ -1,13 +1,13 @@
 #pragma once
 
-inline int auton = 2;
+inline int auton = 1;
 
-inline bool red = false;
+inline bool red = true;
 
 inline bool skills = false;
 
-inline int total = 3;
-inline char* descriptions[] = {"Left", "Right", "Skills"};
+inline int total = 2;
+inline char* descriptions[] = {"Left", "Right"};
 
 constexpr float driveNoise = 0.1f;
 constexpr float angleNoise = 0.01f;
