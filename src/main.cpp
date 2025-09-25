@@ -2,21 +2,20 @@
 
 pros::MotorGroup leftMotors({-12, 13, -14}, pros::MotorGearset::blue);
 pros::MotorGroup rightMotors({8, -9, 10}, pros::MotorGearset::blue);
-lemlib::Drivetrain drivetrain(&leftMotors, &rightMotors, 15.0f, lemlib::Omniwheel::NEW_325, 450.0f, 2.0f);
+lemlib::Drivetrain drivetrain(&leftMotors, &rightMotors, 15.0f, lemlib::Omniwheel::NEW_325, 450, 2);
 
 pros::Imu imu(3);
 pros::Rotation horizontalRotation(-6);
 pros::Rotation verticalRotation(7);
-lemlib::TrackingWheel horizontalWheel(&horizontalRotation, lemlib::Omniwheel::NEW_275, -4.5f);
-lemlib::TrackingWheel verticalWheel(&verticalRotation, lemlib::Omniwheel::NEW_275, -0.5f);
+lemlib::TrackingWheel horizontalWheel(&horizontalRotation, lemlib::Omniwheel::NEW_275, -4.5);
+lemlib::TrackingWheel verticalWheel(&verticalRotation, lemlib::Omniwheel::NEW_275, -0.5);
 lemlib::OdomSensors odometry(&verticalWheel, nullptr, &horizontalWheel, nullptr, &imu);
-// Odometry odom(&imu, &verticalWheel, &horizontalWheel);
 
-lemlib::ControllerSettings lateralPID(10.0f, 0.0f, 10.0f, 3.0f, 1.0f, 100.0f, 3.0f, 500.0f, 0.0f);
-lemlib::ControllerSettings angularPID(4.0f, 0.0f, 11.0f, 3.0f, 1.0f, 100.0f, 3.0f, 500.0f, 0.0f); 
+lemlib::ControllerSettings lateralPID(10, 0, 10, 3, 1, 100, 3, 500, 0);
+lemlib::ControllerSettings angularPID(4, 0, 11, 3, 1, 100, 3, 500, 0); 
 
-lemlib::ExpoDriveCurve lateralCurve(3.0f, 10.0f, 1.019f);
-lemlib::ExpoDriveCurve angularCurve(3.0f, 10.0f, 1.019f);
+lemlib::ExpoDriveCurve lateralCurve(3, 10, 1.019);
+lemlib::ExpoDriveCurve angularCurve(3, 10, 1.019);
 
 lemlib::Chassis chassis(drivetrain, lateralPID, angularPID, odometry, &lateralCurve, &angularCurve);
 
@@ -36,15 +35,15 @@ lv_obj_t *screen;
 // pros::Distance distB(0);
 // pros::Distance distT(0);
 
+// Odometry odom(&imu, &verticalWheel, &horizontalWheel);
+// Distance dist(&distL, &distR, &distB, &distT);
+// MCL mcl(&odom, &dist, &chassis);
+
 // float l0, l1 = 0.0f, r0, r1 = 0.0f;
 
 void initialize() {
     chassis.calibrate(true);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-
-    /*float initX = inch(distX.get_distance() + distXOffset);
-    float initY = inch(distY.get_distance() + distYOffset);
-    std::vector<float> init = {initX, initY, 0.0f};*/
     
     lv_init();
     screen = lv_screen_active();
@@ -61,14 +60,21 @@ void initialize() {
         }
     });
 
-    /*pros::Task juancarlos([&]() {
+    /*pros::Task odomUpdate([&]() {
+        while (true) {
+            odom.update();
+            pros::delay(10);
+        }
+    });
+    */
+
+    /*pros::Task localization([&]() {
         while (true) {
             l0 = l1; l1 = (float)leftMotors.get_position(1);
             r0 = r1; r1 = (float)rightMotors.get_position(1);
-
             float encoderChange = (l1 - l0 + r1 - r0) / 2.0f;
-
-            // mcl(&chassis, &distX, &distY, &imu, init, encoderChange, 500);
+            
+            mcl.update(encoderChange, 500);
 
             pros::delay(10);
         }
@@ -102,28 +108,23 @@ void autonomous() {
         chassis.moveToPoint(-9, 23, 750, {.forwards=false, .maxSpeed=60}, false);
         chassis.turnToHeading(40, 750, {}, false);
         chassis.moveToPoint(0, 36, 1500, {.maxSpeed=60}, false);
-        chassis.turnToHeading(48, 750);
+        chassis.turnToHeading(50, 750);
         middleGoal();
-        pros::delay(2250);
+        pros::delay(3000);
         reset();
 
         // Match Load
-        chassis.moveToPoint(-30, 11, 2250, {.forwards=false}, false);
+        chassis.moveToPoint(-27.5, 12.5, 2250, {.forwards=false}, false);
         chassis.turnToHeading(178, 1000, {.maxSpeed=80}, false);
         intake();
         tongue.extend();
-        drive(90, 1500);
+        drive(110, 1500);
+        drive(-80, 200);
         pros::delay(750);
-        drive(-100, 250);
-        tongue.retract();
-
+        
         // Long Goal
         chassis.moveToPoint(-32, 18, 1000, {.forwards=false, .maxSpeed=80}, false);
-        chassis.turnToHeading(0, 750);
         longGoal();
-        pros::delay(2500);
-        drive(90, 250);
-        drive(-127, 500);
     } else if (auton == 2) { // Right
         // Middle Goal
         intake();
@@ -141,18 +142,44 @@ void autonomous() {
         chassis.turnToHeading(-178, 1000, {.maxSpeed=80}, false);
         intake();
         tongue.extend();
-        drive(90, 1500);
+        drive(110, 1500);
+        drive(-80, 200);
         pros::delay(750);
-        drive(-100, 250);
-        tongue.retract();
 
         // Long Goal
         chassis.moveToPoint(29, 15, 1000, {.forwards=false, .maxSpeed=80}, false);
-        chassis.turnToHeading(0, 750);
         longGoal();
+    } else if (auton == 3) { // Skills 
+        // Middle Goal
+        intake();
+        chassis.moveToPoint(-13, 30, 2000, {.maxSpeed=60}, false);
+        chassis.moveToPoint(-9, 23, 750, {.forwards=false, .maxSpeed=60}, false);
+        pros::delay(1000);
+        chassis.turnToHeading(40, 750, {}, false);
+        chassis.moveToPoint(0, 36, 1500, {.maxSpeed=60}, false);
+        chassis.turnToHeading(50, 750);
+        middleGoal();
+        pros::delay(5000);
+        reset();
+
+        // Match Load
+        chassis.moveToPoint(-27.5, 12.5, 3000, {.forwards=false}, false);
+        chassis.turnToHeading(178, 1000, {.maxSpeed=80}, false);
+        intake();
+        tongue.extend();
+        drive(110, 1500);       
+        drive(-80, 200);       
         pros::delay(2000);
-        drive(90, 500);
-        drive(-127, 500);
+        drive(-80, 200);
+        pros::delay(2000);
+        
+        // Long Goal
+        chassis.moveToPoint(-32, 18, 1000, {.forwards=false, .maxSpeed=80}, false);
+        longGoal();
+        pros::delay(10000);
+        reset();
+        chassis.tank(100, 500);
+        chassis.tank(-127, 1000);
     }
 }
 
@@ -162,35 +189,17 @@ void opcontrol() {
     while (true) {
         chassis.tank(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
-        // Control Scheme 1 (Karl): 
-        // Intake - L2
-        // Intake Top - Y
-        // Outtake - L1
-        // Long Goal - R2
-        // Middle Goal - R1
-        // Tongue - X
-        // Elbow - LEFT/RIGHT
-
-        // Control Scheme 2 (Shakey): 
-        // Intake - L2
-        // Intake Top - Y
-        // Outtake - R1
-        // Long Goal - R2
-        // Middle Goal - L1
-        // Tongue - DOWN
-        // Elbow - LEFT/RIGHT
-
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) { 
             // Intake
             basket.move(-127);
             bottom.move(127);
             lift.move(-127);      
         } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
-            // Intake Top
+            // Intake to top
             basket.move(-127);
             bottom.move(127);
             lift.move(127);
-        } else if ((!skills && controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) || (skills && controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))) { 
+        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) { 
             // Outtake
             basket.move(127);
             bottom.move(-114);
@@ -202,7 +211,7 @@ void opcontrol() {
             bottom.move(127);
             lift.move(127);
             top.move(127);
-        } else if ((!skills && controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) || (skills && controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))) { 
+        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) { 
             // Middle goal
             basket.move(16);
             bottom.move(127);
@@ -215,11 +224,11 @@ void opcontrol() {
             top.move(0);
         }
 
-        if ((!skills && controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)) || (skills && controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))) {
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
             // Tongue
             if (tongue.is_extended()) tongue.retract();
             else tongue.extend();
-            pros::delay(500);
+            pros::delay(250);
         }
 
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
@@ -227,7 +236,7 @@ void opcontrol() {
             elbowR.retract();
             if (elbowL.is_extended()) elbowL.retract();
             else elbowL.extend();
-            pros::delay(500);
+            pros::delay(250);
         }
 
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
@@ -235,7 +244,7 @@ void opcontrol() {
             elbowL.retract();
             if (elbowR.is_extended()) elbowR.retract();
             else elbowR.extend();
-            pros::delay(500);
+            pros::delay(250);
         }
 
         pros::delay(20);

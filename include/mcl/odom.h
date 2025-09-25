@@ -29,11 +29,8 @@ class Odometry {
         float lastT = 0.0f;
     
     public:
-        Odometry(pros::Imu *inertial, lemlib::TrackingWheel *vertical, lemlib::TrackingWheel *horizontal) {
-            imu = inertial;
-            vert = vertical;
-            hori = horizontal;
-        }
+        Odometry(pros::Imu *inertial, lemlib::TrackingWheel *vertical, lemlib::TrackingWheel *horizontal) : 
+        imu(inertial), vert(vertical), hori(horizontal) {}
 
         void update() {
             p.theta = wrap((float)imu->get_heading());

@@ -20,18 +20,12 @@ class Distance {
         float initT = 0.0f;
     
     public:
-        Distance(pros::Distance *left, pros::Distance *right, pros::Distance *bottom, pros::Distance *top) {
-            l = left;
-            r = right;
-            b = bottom;
-            t = top;
-        }
+        Distance(pros::Distance *left, pros::Distance *right, pros::Distance *bottom, pros::Distance *top) :
+        l(left), r(right), b(bottom), t(top) {}
 
-        float updateX();
+        void updateInit(float x, float y, float theta) {}
 
-        float updateY();
+        float* updateX() {}
 
-        float getInit();
-
-        float updateInit();
+        float* updateY() {}
 };

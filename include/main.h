@@ -4,9 +4,9 @@
 #include "api.h"
 #include "config.h"
 #include "screen.h"
-//#include "mcl.h"
-//#include "odom.h"
-//#include "dist.h"
+//#include "mcl/mcl.h"
+//#include "mcl/odom.h"
+//#include "mcl/dist.h"
 
 #include "lemlib/api.hpp"
 #include "liblvgl/lvgl.h"
