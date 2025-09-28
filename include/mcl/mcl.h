@@ -19,7 +19,9 @@ class MCL {
     private:
         std::vector<float> pose;
         std::vector<particle> particles;
+
         std::ranlux24_base rng;
+        int M;
 
         std::uniform_real_distribution<float> xDist;
         std::uniform_real_distribution<float> yDist;
@@ -29,10 +31,10 @@ class MCL {
         lemlib::Chassis *chassis;        
     
     public:
-        MCL(Odometry *odometry, Distance *distance, lemlib::Chassis *chasiss) : 
-        odom(odometry), dist(distance), pose({0.0f, 0.0f, 0.0f}), chassis(chasiss), rng(355), xDist(bounds[0], bounds[1]), yDist(bounds[2], bounds[3]) {}
+        MCL(Odometry *odometry, Distance *distance, lemlib::Chassis *chasiss, int m) : 
+        odom(odometry), dist(distance), pose({0.0f, 0.0f, 0.0f}), chassis(chasiss), M(m), rng(355), xDist(bounds[0], bounds[1]), yDist(bounds[2], bounds[3]) {}
 
-        void makeParticles(int M) {
+        void makeParticles() {
             for (int i = 0; i < M; i++) {
                 particle p {xDist(rng), yDist(rng), 0.0f};
                 particles.push_back(p);
@@ -60,6 +62,12 @@ class MCL {
             y = odomPose.y;
             theta = odomPose.theta;
 
+            auto distReset = dist->poseReset(theta);
+            if (distReset.first != 676741.0f && distReset.second != 676741.0f) {
+                x = distReset.first;
+                y = distReset.second;
+            }
+
             pose = {x, y, theta};
         }
 
@@ -77,7 +85,7 @@ class MCL {
             }
         }
 
-        void resample(int M) {
+        void resample() {
             std::vector<float> weights;
             for (auto &p : particles) weights.push_back(p.weight);
 
@@ -104,8 +112,8 @@ class MCL {
             particles = resampled;
         }
 
-        void update(float dF, int M) {
-            if (particles.size() == 0) makeParticles(M);
+        void update(float dF) {
+            if (particles.size() == 0) makeParticles();
 
             sensorUpdate();
 

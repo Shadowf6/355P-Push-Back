@@ -7,7 +7,7 @@ inline bool red = true;
 inline bool skills = false;
 
 inline int total = 3;
-inline char* descriptions[] = {"Left", "Right", "Skills"};
+inline char* descriptions[] = {"Left", "Right", "Skills", "f"};
 
 constexpr float driveNoise = 0.1f;
 constexpr float angleNoise = 0.01f;

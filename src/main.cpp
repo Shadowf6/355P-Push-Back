@@ -37,7 +37,7 @@ lv_obj_t *screen;
 
 // Odometry odom(&imu, &verticalWheel, &horizontalWheel);
 // Distance dist(&distL, &distR, &distB, &distT);
-// MCL mcl(&odom, &dist, &chassis);
+// MCL mcl(&odom, &dist, &chassis, 500);
 
 // float l0, l1 = 0.0f, r0, r1 = 0.0f;
 
@@ -74,8 +74,7 @@ void initialize() {
             r0 = r1; r1 = (float)rightMotors.get_position(1);
             float encoderChange = (l1 - l0 + r1 - r0) / 2.0f;
             
-            mcl.update(encoderChange, 500);
-
+            mcl.update(encoderChange);
             pros::delay(10);
         }
     });*/
@@ -96,44 +95,46 @@ void autonomous() {
 
     auto intake([&]() {basket.move(-127); bottom.move(127); lift.move(-127);});
     auto outtake([&]() {basket.move(127); bottom.move(-127); lift.move(127);});
-    auto longGoal([&]() {basket.move(16); bottom.move(127); lift.move(127); top.move(127);});
-    auto middleGoal([&]() {basket.move(16); bottom.move(127); lift.move(127); top.move(-114);});
+    auto longGoal([&]() {basket.move(18); bottom.move(127); lift.move(127); top.move(127);});
+    auto middleGoal([&]() {basket.move(18); bottom.move(127); lift.move(127); top.move(-127);});
     auto drive([&](int speed, int ms) {chassis.tank(speed, speed); pros::delay(ms); chassis.tank(0, 0);});
     auto reset([&]() {basket.move(0); bottom.move(0); lift.move(0); top.move(0);});
 
     if (auton == 1) { // Left
         // Middle Goal
+        bottom.move(127);
         intake();
-        chassis.moveToPoint(-13, 30, 2000, {.maxSpeed=60}, false);
+        chassis.moveToPoint(-13, 30, 2000, {.maxSpeed=50}, false);
+        pros::delay(500);
         chassis.moveToPoint(-9, 23, 750, {.forwards=false, .maxSpeed=60}, false);
         chassis.turnToHeading(40, 750, {}, false);
-        chassis.moveToPoint(0, 36, 1500, {.maxSpeed=60}, false);
-        chassis.turnToHeading(50, 750);
+        chassis.moveToPoint(0, 35, 1250, {.maxSpeed=60}, false);
         middleGoal();
+        chassis.turnToHeading(50, 750);
         pros::delay(3000);
         reset();
 
         // Match Load
-        chassis.moveToPoint(-27.5, 12.5, 2250, {.forwards=false}, false);
-        chassis.turnToHeading(178, 1000, {.maxSpeed=80}, false);
+        chassis.moveToPoint(-27.5, 12.5, 2000, {.forwards=false}, false);
+        chassis.turnToHeading(178, 750, {.maxSpeed=80}, false);
         intake();
         tongue.extend();
-        drive(110, 1500);
+        drive(100, 1500);
         drive(-80, 200);
         pros::delay(750);
+        longGoal();
         
         // Long Goal
         chassis.moveToPoint(-32, 18, 1000, {.forwards=false, .maxSpeed=80}, false);
-        longGoal();
     } else if (auton == 2) { // Right
         // Middle Goal
         intake();
         chassis.moveToPoint(12, 30, 2000, {.maxSpeed=50}, false);
         chassis.moveToPoint(9, 23, 750, {.forwards=false, .maxSpeed=60}, false);
-        chassis.turnToHeading(-40, 750, {}, false);
-        chassis.moveToPoint(-1, 33, 1500, {.maxSpeed=60}, false);
-        chassis.turnToHeading(-48, 750);
+        chassis.turnToHeading(-50, 750, {}, false);
+        chassis.moveToPoint(-1, 32, 1500, {.maxSpeed=60}, false);
         outtake();
+        chassis.turnToHeading(-50, 750);
         pros::delay(2000);
         reset();
 
@@ -142,7 +143,7 @@ void autonomous() {
         chassis.turnToHeading(-178, 1000, {.maxSpeed=80}, false);
         intake();
         tongue.extend();
-        drive(110, 1500);
+        drive(100, 1500);
         drive(-80, 200);
         pros::delay(750);
 
@@ -178,8 +179,8 @@ void autonomous() {
         longGoal();
         pros::delay(10000);
         reset();
-        chassis.tank(100, 500);
-        chassis.tank(-127, 1000);
+        drive(100, 500);
+        drive(-127, 1000);
     }
 }
 
@@ -207,16 +208,16 @@ void opcontrol() {
             top.move(127); 
         } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) { 
             // Long goal
-            basket.move(16);
+            basket.move(18);
             bottom.move(127);
             lift.move(127);
             top.move(127);
         } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) { 
             // Middle goal
-            basket.move(16);
+            basket.move(18);
             bottom.move(127);
             lift.move(127);
-            top.move(-114);
+            top.move(-127);
         } else {
             basket.move(0);
             bottom.move(0);
