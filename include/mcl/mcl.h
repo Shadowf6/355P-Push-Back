@@ -45,8 +45,8 @@ class MCL {
             std::uniform_real_distribution<float> driveDist(dF - driveNoise * dF, dF + driveNoise * dF);
             std::uniform_real_distribution<float> angleDist(pose[2] - angleNoise, pose[2] + angleNoise);
 
-            for (auto& p : particles) {
-                float drive = driveDist(rng) * driveConst;
+            for (auto &p : particles) {
+                float drive = driveDist(rng);
                 float angle = angleDist(rng);
 
                 p.x += drive * sinf(rad(angle));
@@ -63,7 +63,7 @@ class MCL {
             theta = odomPose.theta;
 
             auto distReset = dist->poseReset(theta);
-            if (distReset.first != 676741.0f && distReset.second != 676741.0f) {
+            if (distReset.first != 676741 && distReset.second != 676741) {
                 x = distReset.first;
                 y = distReset.second;
             }
@@ -72,7 +72,7 @@ class MCL {
         }
 
         void weighParticles() {
-            for (auto& p : particles) {
+            for (auto &p : particles) {
                 if (p.x > bounds[0] || p.x < bounds[1] || p.y > bounds[2] || p.y < bounds[3]) {
                     p.x = xDist(rng);
                     p.y = yDist(rng);
@@ -132,6 +132,8 @@ class MCL {
             sensorUpdate();
 
             weighParticles();
+
+            resample();
 
             float sumX = 0.0f, sumY = 0.0f;
             for (auto &p : particles) {

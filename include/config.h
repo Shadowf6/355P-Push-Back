@@ -7,12 +7,11 @@ inline bool red = true;
 inline bool skills = false;
 
 inline int total = 3;
-inline char* descriptions[] = {"Left", "Right", "Skills", "f"};
+inline char* descriptions[] = {"Left (AWP)", "Right (Elim)", "Skills"};
 
 constexpr float driveNoise = 0.1f;
-constexpr float angleNoise = 0.01f;
+constexpr float angleNoise = 0.001f;
 constexpr float odomNoise = 0.01f;
-constexpr float driveConst = 1.0f;
 
 constexpr float distXOffset = 0.0f;
 constexpr float distYOffset = 0.0f;

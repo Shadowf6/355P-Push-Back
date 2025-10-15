@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "Great Planes",
+    "project_name": "6767K",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -635,9 +635,9 @@
       }
     },
     "upload_options": {
-      "description": "The planes are great",
-      "icon": "ufo",
-      "after": "none"
+      "description": "Kawaii Karl",
+      "icon": "X",
+      "after": "screen"
     },
     "use_early_access": false
   }

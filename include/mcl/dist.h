@@ -100,7 +100,7 @@ class Distance {
                 float c = cosf(rad(theta));
                 float s = sinf(rad(theta));
                 
-                return {x * c + y * s, -x * s + y * c};
+                return {x, y};
             }
 
             return {676741, 676741};
