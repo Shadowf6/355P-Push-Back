@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "6767K",
+    "project_name": "Lake Park",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -635,9 +635,9 @@
       }
     },
     "upload_options": {
-      "description": "Kawaii Karl",
-      "icon": "X",
-      "after": "screen"
+      "description": "lake ahh park",
+      "icon": "robot",
+      "after": "none"
     },
     "use_early_access": false
   }

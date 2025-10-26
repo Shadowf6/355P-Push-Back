@@ -4,6 +4,7 @@
 
 #include "liblvgl/lvgl.h"
 #include "pros/rtos.h"
+
 #include <iostream>
 
 void swapSide(lv_event_t* e);
@@ -11,4 +12,3 @@ void nextAuton(lv_event_t* e);
 void prevAuton(lv_event_t* e);
 void createDisplay(lv_obj_t* screen);
 void updateCoords(float x, float y, float t);
-void updateDist(float x, float y);

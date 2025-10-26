@@ -1,12 +1,12 @@
 #pragma once
 
-inline int auton = 1;
+inline int auton = 2;
 
 inline bool red = true;
 
 inline bool skills = false;
 
-inline int total = 3;
+inline int total = 4;
 inline char* descriptions[] = {"Left (AWP)", "Right (Elim)", "Skills"};
 
 constexpr float driveNoise = 0.1f;
