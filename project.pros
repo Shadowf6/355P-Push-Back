@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "Lake Park",
+    "project_name": "Menasha",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -635,8 +635,8 @@
       }
     },
     "upload_options": {
-      "description": "lake ahh park",
-      "icon": "robot",
+      "description": " ",
+      "icon": "alien",
       "after": "none"
     },
     "use_early_access": false
