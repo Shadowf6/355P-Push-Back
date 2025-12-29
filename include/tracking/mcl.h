@@ -1,13 +1,15 @@
 #pragma once
 
 #include "utils.h"
-#include "config.h"
 #include "odom.h"
 #include "dist.h"
-
 #include "lemlib/chassis/chassis.hpp"
-
 #include <random>
+
+constexpr float driveNoise = 0.1f;
+constexpr float angleNoise = 0.001f;
+constexpr float odomNoise = 0.01f;
+constexpr float bounds[] = {0.0f, 144.0f, 0.0f, 144.0f};
 
 struct particle { 
     float x;
@@ -62,8 +64,8 @@ class MCL {
             y = odomPose.y;
             theta = odomPose.theta;
 
-            auto distReset = dist->poseReset(theta);
-            if (distReset.first != 676741 && distReset.second != 676741) {
+            auto distReset = dist->getDist(theta);
+            if (distReset.first != 9999.0f && distReset.second != 9999.0f) {
                 x = distReset.first;
                 y = distReset.second;
             }

@@ -1,30 +1,19 @@
 #include "screen.h"
 
 lv_obj_t *lx, *ly, *lt;
+lv_obj_t *dl, *dr, *db;
 lv_obj_t *curr, *desc, *next, *prev, *lnext, *lprev;
-lv_obj_t *side, *bside, *lside;
-
-void swapSide(lv_event_t* e) {
-    red = !red;
-
-    char s[12]; snprintf(s, sizeof(s), "Color: %s", red ? "Red" : "Blue"); 
-    lv_label_set_text(side, s); 
-}
 
 void nextAuton(lv_event_t* e) {
     auton = auton % total + 1; 
-
-    char a[20]; snprintf(a, sizeof(a), "Selected Auton: %d", auton); 
-    lv_label_set_text(curr, a); 
+    lv_label_set_text_fmt(curr, "Selected Auton: %d", auton); 
     lv_label_set_text(desc, descriptions[auton - 1]);
 }
 
 void prevAuton(lv_event_t* e) {
     auton = (auton + total - 2) % total + 1; 
-
-    char a[20]; snprintf(a, sizeof(a), "Selected Auton: %d", auton); 
-    lv_label_set_text(curr, a); 
-    lv_label_set_text(desc, descriptions[auton - 1]); 
+    lv_label_set_text_fmt(curr, "Selected Auton: %d", auton); 
+    lv_label_set_text(desc, descriptions[auton - 1]);
 }
 
 void createDisplay(lv_obj_t* screen) {
@@ -37,6 +26,15 @@ void createDisplay(lv_obj_t* screen) {
     lt = lv_label_create(screen); 
     lv_obj_align(lt, LV_ALIGN_TOP_LEFT, 20, 80);
 
+    dl = lv_label_create(screen);
+    lv_obj_align(dl, LV_ALIGN_TOP_LEFT, 20, 130);
+
+    dr = lv_label_create(screen);
+    lv_obj_align(dr, LV_ALIGN_TOP_LEFT, 20, 160);
+
+    db = lv_label_create(screen);
+    lv_obj_align(db, LV_ALIGN_TOP_LEFT, 20, 190);
+
     curr = lv_label_create(screen); 
     lv_obj_align(curr, LV_ALIGN_TOP_RIGHT, -50, 20);
 
@@ -44,13 +42,13 @@ void createDisplay(lv_obj_t* screen) {
     lv_obj_align(desc, LV_ALIGN_TOP_RIGHT, -50, 50);
 
     next = lv_button_create(screen);  
-    lv_obj_align(next, LV_ALIGN_TOP_RIGHT, -50, 90); 
-    lv_obj_set_style_bg_color(next, lv_color_hex(0x808080), 0); 
+    lv_obj_align(next, LV_ALIGN_TOP_RIGHT, -50, 80); 
+    lv_obj_set_style_bg_color(next, lv_color_hex(0x6082B6), 0); 
     lv_obj_add_event_cb(next, nextAuton, LV_EVENT_SHORT_CLICKED, nullptr);
 
     prev = lv_button_create(screen); 
-    lv_obj_align(prev, LV_ALIGN_TOP_RIGHT, -120, 90); 
-    lv_obj_set_style_bg_color(prev, lv_color_hex(0x808080), 0); 
+    lv_obj_align(prev, LV_ALIGN_TOP_RIGHT, -100, 80); 
+    lv_obj_set_style_bg_color(prev, lv_color_hex(0x6082B6), 0); 
     lv_obj_add_event_cb(prev, prevAuton, LV_EVENT_SHORT_CLICKED, nullptr);
 
     lnext = lv_label_create(next); 
@@ -59,32 +57,18 @@ void createDisplay(lv_obj_t* screen) {
     lprev = lv_label_create(prev); 
     lv_label_set_text(lprev, "<");
 
-    side = lv_label_create(screen); 
-    lv_obj_align(side, LV_ALIGN_TOP_RIGHT, -50, 150);
-
-    bside = lv_button_create(screen); 
-    lv_obj_align(bside, LV_ALIGN_TOP_RIGHT, -50, 180); 
-    lv_obj_set_style_bg_color(bside, lv_color_hex(0x808080), 0); 
-    lv_obj_add_event_cb(bside, swapSide, LV_EVENT_SHORT_CLICKED, nullptr);
-
-    lside = lv_label_create(bside); 
-    lv_label_set_text(lside, "Switch");
-
-    char a[20]; snprintf(a, sizeof(a), "Selected Auton: %d", auton); 
-    lv_label_set_text(curr, a); 
+    lv_label_set_text_fmt(curr, "Selected Auton: %d", auton); 
     lv_label_set_text(desc, descriptions[auton - 1]);
-
-    char c[20]; snprintf(c, sizeof(c), "Color: %s", red ? "Red" : "Blue"); 
-    lv_label_set_text(side, c);
 }
 
 void updateCoords(float x, float y, float t) {
-    char xx[20]; snprintf(xx, sizeof(xx), "X: %.3f", x); 
-    lv_label_set_text(lx, xx); 
+    lv_label_set_text_fmt(lx, "X: %.3f", x); 
+    lv_label_set_text_fmt(ly, "Y: %.3f", y); 
+    lv_label_set_text_fmt(lt, "Theta: %.3f", t);
+}
 
-    char yy[20]; snprintf(yy, sizeof(yy), "Y: %.3f", y); 
-    lv_label_set_text(ly, yy); 
-
-    char tt[20]; snprintf(tt, sizeof(tt), "Theta: %.3f", t); 
-    lv_label_set_text(lt, tt);
+void updateDist(float l, float r, float b) {
+    lv_label_set_text_fmt(dl, "L: %f", l);
+    lv_label_set_text_fmt(dr, "R: %f", r);
+    lv_label_set_text_fmt(db, "B: %f", b);
 }

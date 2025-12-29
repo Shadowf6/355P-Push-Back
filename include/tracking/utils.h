@@ -2,16 +2,17 @@
 
 #include <cmath>
 
-inline float rad(float deg) { 
-    return deg * M_PI / 180.0f; 
+float rad(float deg) { 
+    return deg * 0.01745329251f; 
 }
 
-inline float inch(float mm) { 
+float inch(float mm) { 
     return mm / 25.4f; 
 }
 
-inline float wrap(float t) { 
+float wrap(float t) { 
     t = std::fmod(t + 180, 360); 
     if (t < 0) t += 360; 
     return t - 180; 
 }
+
