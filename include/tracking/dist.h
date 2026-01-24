@@ -40,15 +40,7 @@ class Distance {
             float dr = r->get();
             float db = b->get();
 
-            if (dl <= 2000 && dr <= 2000) {
-                x = (dl - hoffsetL * cosT + voffsetL * sinT) * l->get_confidence();
-                x += (3657.6 - dr - hoffsetR * cosT + voffsetR * sinT) * r->get_confidence();
-
-                int sum = l->get_confidence() + r->get_confidence();
-                if (sum != 0) { x /= sum; x -= initX; }
-                else return {9999, 9999};
-                x = inch(x) - initX;
-            } else if (dl <= 2000) {
+            if (dl <= 2000) {
                 x = dl - hoffsetL * cosT + voffsetL * sinT;
                 x = inch(x) - initX;
             } else if (dr <= 2000) {

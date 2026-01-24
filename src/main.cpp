@@ -18,9 +18,9 @@ lemlib::Chassis chassis(drivetrain, lateralPID, angularPID, odometry);
 pros::Motor intake(-20, pros::MotorGearset::blue);
 pros::Motor score(-1, pros::MotorGearset::blue);
 
-pros::adi::Pneumatics pivot('A', false);
-pros::adi::Pneumatics tongue('C', false);
-pros::adi::Pneumatics wing('B', false);
+pros::adi::Pneumatics pivot('E', false);
+pros::adi::Pneumatics tongue('D', false);
+pros::adi::Pneumatics wing('C', false);
 
 pros::Distance left(6);
 pros::Distance right(14);
@@ -28,10 +28,12 @@ pros::Distance bottom(13);
 
 lv_obj_t *screen;
 
-void initialize() {                                                                                                                                                                                             
+void initialize() {                                                                                                                                                                                       
     chassis.calibrate();
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     score.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    leftMotors.set_voltage_limit_all(12000);
+    rightMotors.set_voltage_limit_all(12000);
 
     screen = lv_screen_active();
     createDisplay(screen);
@@ -47,7 +49,7 @@ void initialize() {
             auto pose = chassis.getPose();
             updateCoords(pose.x, pose.y, pose.theta, 0.0f, 0.0f, 0.0f);
 
-            pros::delay(30);
+            pros::delay(50);
         }
     });
 }
@@ -67,7 +69,7 @@ void autonomous() {
     auto in([&]() {intake.move(127); score.move_absolute(0.0, 600);});
     auto out([&](int ms) {intake.move(-100); pros::delay(ms); intake.move(0);});
     auto reset([&]() {intake.move(0); score.move(0); score.tare_position();});
-    auto goal([&]() {intake.move(127); score.move(127);});
+    auto goal([&](int ms) {intake.move(127); score.move(127); pros::delay(ms); reset();});
     
     auto drive([&](int speed, int ms) {chassis.tank(speed, speed, true); pros::delay(ms); chassis.tank(0, 0, true);});
     auto toWall([&](char side, float dist, float exit, int dir, int speed) {
@@ -84,189 +86,270 @@ void autonomous() {
         chassis.tank(0, 0);
     });
 
-    if (auton == 1) { // 4+3+3 (Right)
-        // Match Load
-        chassis.moveToPoint(0, 35.5, 1000, {.maxSpeed=100}, false);
-        tongue.extend();
-        chassis.turnToHeading(88, 750, {.maxSpeed=80}, false);
-        in();
-        chassis.moveToPoint(14, 35.5, 1000, {}, false);
-        
-        // Long Goal
-        chassis.moveToPoint(-45, 35, 750, {.forwards=false, .maxSpeed=80}, false);
-        chassis.tank(-50, -50); 
-        goal(); 
-        pros::delay(1250);
-        tongue.retract();
-        chassis.tank(0, 0);
-        reset();
-        chassis.setPose(-45, 34, 90);
-
-        // Right Corner
-        chassis.swingToHeading(185, DriveSide::RIGHT, 1000, {.maxSpeed=60}, false);
-        in();
-        drive(50, 400);
-        pros::delay(100);
-
-        // Left Corner
-        chassis.turnToHeading(-175, 500, {}, false);
-        chassis.moveToPoint(-45, -41, 1000, {.maxSpeed=80}, false);
-
-        // Mid Goal
-        chassis.turnToHeading(120, 500, {.maxSpeed=80}, false);
-        reset();
-        chassis.moveToPoint(-59, -26, 750, {.forwards=false, .maxSpeed=80}, false);
-        chassis.turnToHeading(135, 250, {}, false);
-        pivot.extend();
-        goal();
-        pros::delay(750);
-        pivot.retract();
-        reset();
-        chassis.setPose(-60, -27, 135);
-
-        // Match Load
-        chassis.moveToPoint(-25, -63.5, 1250, {.maxSpeed=100}, false);
-        tongue.extend();
-        chassis.turnToHeading(88, 500, {}, false);
-        in();
-        chassis.moveToPoint(-4, -63.5, 1000, {.maxSpeed=110}, false);
-
-        // Long Goal
-        chassis.moveToPoint(-50, -64, 750, {.forwards=false, .maxSpeed=80}, false);
-        chassis.tank(-50, -50);
-        goal();
-    } else if (auton == 2) { // 3+4 (Left)
+    if (auton == 1) { // 7 Rush (Right)
         // Corner
         in();
-        chassis.moveToPoint(-12, 26, 2500, {.maxSpeed=50}); 
-        pros::delay(1200);
+        chassis.moveToPoint(12, 26, 1000, {.maxSpeed=80}); 
+        pros::delay(750); tongue.extend(); chassis.waitUntilDone();
+        
+        // Match Load
+        chassis.turnToHeading(142, 750, {}, false);
+        reset();
+        chassis.moveToPoint(36.5, 2, 1000, {.maxSpeed=100}, false);
+        chassis.turnToHeading(180, 750, {}, false);
+        in();
+        chassis.moveToPoint(37, -16, 1000, {.maxSpeed=80}, false);
+        
+        // Goal
+        chassis.moveToPoint(37, 30, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.tank(-50, -50);
+        out(100);
+        goal(2000);
+        tongue.retract(); 
+        wing.extend(); pros::delay(250); wing.retract();
+        chassis.setPose(38, 20, wrap(imu.get_heading()));
+
+        // Wing
+        chassis.moveToPoint(38, 1, 750, {.maxSpeed=80}, false);
+        chassis.moveToPoint(48, 16, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.turnToHeading(180, 750, {}, false);
+        chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+        chassis.moveToPoint(48, 37, 100000, {.forwards=false, .maxSpeed=80}, false);
+    } else if (auton == 2) { // 4 Rush (Right)
+        // Corner
+        in();
+        chassis.moveToPoint(12, 26, 1000, {.maxSpeed=80}, false); 
+        
+        // Goal
+        chassis.turnToHeading(142, 750, {}, false);
+        reset();
+        chassis.moveToPoint(37, 2, 1000, {.maxSpeed=100}, false);
+        chassis.turnToHeading(180, 750, {}, false);
+        in();
+        chassis.moveToPoint(36.7, 30, 750, {.forwards=false, .maxSpeed=80}, false);
+        chassis.tank(-50, -50);
+        goal(1250);
+        wing.extend(); pros::delay(250); wing.retract();
+        chassis.setPose(38, 20, wrap(imu.get_heading()));
+
+        // Wing
+        chassis.moveToPoint(38, 1, 750, {.maxSpeed=80}, false);
+        chassis.moveToPoint(48, 16, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.turnToHeading(180, 750, {}, false);
+        chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+        chassis.moveToPoint(48, 37, 100000, {.forwards=false, .maxSpeed=100}, false);
+    } else if (auton == 3) { // 7 Rush (Left)
+        // Corner
+        in();
+        chassis.moveToPoint(-12, 26, 1000, {.maxSpeed=80}); 
+        pros::delay(750); tongue.extend(); chassis.waitUntilDone();
+        
+        // Match Load
+        chassis.turnToHeading(-142, 750, {}, false);
+        reset();
+        chassis.moveToPoint(-36.5, 2, 1000, {.maxSpeed=100}, false);
+        chassis.turnToHeading(-180, 750, {}, false);
+        in();
+        chassis.moveToPoint(-37, -16, 1000, {.maxSpeed=80}, false);
+        
+        // Goal
+        chassis.moveToPoint(-37, 30, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.tank(-50, -50);
+        out(100);
+        goal(2000);
+        tongue.retract(); 
+        wing.extend(); pros::delay(250); wing.retract();
+        chassis.setPose(-38, 20, wrap(imu.get_heading()));
+
+        // Wing
+        chassis.moveToPoint(-38, 1, 750, {.maxSpeed=80}, false);
+        chassis.moveToPoint(-48, 16, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.turnToHeading(-180, 750, {}, false);
+        chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+        chassis.moveToPoint(-48, 37, 100000, {.forwards=false, .maxSpeed=80}, false);
+    } else if (auton == 4) { // 4 Rush (Left)
+        // Corner
+        in();
+        chassis.moveToPoint(-12, 26, 1000, {.maxSpeed=80}, false); 
+        
+        // Goal
+        chassis.turnToHeading(-142, 750, {}, false);
+        reset();
+        chassis.moveToPoint(-37, 2, 1000, {.maxSpeed=100}, false);
+        chassis.turnToHeading(-180, 750, {}, false);
+        in();
+        chassis.moveToPoint(-36.7, 30, 750, {.forwards=false, .maxSpeed=80}, false);
+        chassis.tank(-50, -50);
+        goal(1250);
+        wing.extend(); pros::delay(250); wing.retract();
+        chassis.setPose(-38, 20, wrap(imu.get_heading()));
+
+        // Wing
+        chassis.moveToPoint(-38, 1, 750, {.maxSpeed=80}, false);
+        chassis.moveToPoint(-48, 16, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.turnToHeading(-180, 750, {}, false);
+        chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+        chassis.moveToPoint(-48, 37, 100000, {.forwards=false, .maxSpeed=100}, false);
+    } else if (auton == 5) { // 2+5 (Left)
+        // Corner
+        in();
+        chassis.moveToPoint(-12, 26, 1000, {.maxSpeed=80}); 
+        pros::delay(750);
         tongue.extend(); 
         chassis.waitUntilDone();
 
         // Middle Goal
         chassis.turnToHeading(-135, 750, {.maxSpeed=80}, false);
-        chassis.moveToPoint(3, 36.8, 1000, {.forwards=false, .maxSpeed=60}, false);
+        chassis.moveToPoint(1.5, 39, 750, {.forwards=false, .maxSpeed=80}, false);
         pivot.extend();
-        goal(); 
-        pros::delay(600);
+        goal(250); 
         pivot.retract();
         reset();
+        chassis.setPose(1.5, 39, wrap(imu.get_heading()));
+        pros::delay(500);
 
         // Match Load
-        chassis.moveToPoint(-34.25, 2, 2000, {.maxSpeed=80}, false); 
+        chassis.moveToPoint(-38, 4, 2000, {.maxSpeed=100}, false); 
         chassis.turnToHeading(180, 750, {.maxSpeed=80}, false);
         in();
-        chassis.moveToPoint(-34.5, -13.4, 1500, {.maxSpeed=60}, false);
+        chassis.moveToPoint(-38, -15, 1000, {.maxSpeed=80}, false);
         
         // Long Goal
-        chassis.moveToPoint(-34.5, 30, 1500, {.forwards=false, .maxSpeed=80}, false);
-        chassis.tank(-50, -50);
-        goal();
-    } else if (auton == 3) { // 7 (Right)
-        // Corner
-        in();
-        chassis.moveToPoint(12, 26, 2500, {.maxSpeed=50}); 
-        pros::delay(1200);
-        tongue.extend();
-        pros::delay(500); 
-        chassis.waitUntilDone();
-
-        // Match Load
-        chassis.turnToHeading(142, 1000, {.maxSpeed=80}, false);
-        chassis.moveToPoint(37.5, 2, 2000, {.maxSpeed=80}, false);
-        chassis.turnToHeading(180, 750, {.maxSpeed=80}, false);
-        chassis.moveToPoint(38, -12.7, 1400, {.maxSpeed=60}, false);
-        
-        // Long Goal
-        chassis.moveToPoint(38.8, 30, 1500, {.forwards=false, .maxSpeed=80}, false);
+        chassis.moveToPoint(-38, 30, 1000, {.forwards=false, .maxSpeed=80}, false);
         chassis.tank(-50, -50);
         out(100);
-        goal();
-    } else if (auton == 4) { // 4+W (Right)
-        // Match Load
-        chassis.moveToPoint(0, 35.5, 1000, {.maxSpeed=100}, false);
-        tongue.extend();
-        chassis.turnToHeading(88, 750, {.maxSpeed=80}, false);
-        in();
-        chassis.moveToPoint(14, 35.5, 1000, {}, false);
-        
-        // Long Goal
-        chassis.moveToPoint(-45, 35, 750, {.forwards=false, .maxSpeed=80}, false);
-        chassis.tank(-50, -50); 
-        goal(); 
-        pros::delay(1250);
+        goal(1200);
         tongue.retract();
-        chassis.tank(0, 0);
-        reset();
-        chassis.setPose(-45, 34, 90);
-        wing.extend();
-        wing.retract();
+        wing.extend(); pros::delay(250); wing.retract();
+        chassis.setPose(-37, 20, wrap(imu.get_heading()));
 
         // Wing
-        chassis.moveToPoint(-35, 44, 1000, {.maxSpeed=80}, false);
-        chassis.turnToHeading(90, 750, {}, false);
-        chassis.moveToPoint(-64, 44, 20000000, {.forwards=false, .maxSpeed=60});
-    } else if (auton == 5) { // 4+W (Left)
-        // Match Load
-        chassis.moveToPoint(0, 35.5, 1000, {.maxSpeed=100}, false);
-        tongue.extend();
-        chassis.turnToHeading(-88, 750, {.maxSpeed=80}, false);
-        in();
-        chassis.moveToPoint(-14, 35.5, 1000, {}, false);
-        
-        // Long Goal
-        chassis.moveToPoint(45, 35, 750, {.forwards=false, .maxSpeed=80}, false);
-        chassis.tank(-50, -50); 
-        goal(); 
-        pros::delay(1250);
-        tongue.retract();
-        chassis.tank(0, 0);
-        reset();
-        chassis.setPose(45, 34, -90);
-        wing.extend();
-        wing.retract();
-
-        // Wing
-        chassis.moveToPoint(35, 44, 1000, {.maxSpeed=80}, false);
-        chassis.turnToHeading(-90, 750, {}, false);
-        chassis.moveToPoint(64, 44, 20000000, {.forwards=false, .maxSpeed=60});
+        chassis.moveToPoint(-37, 1, 750, {.maxSpeed=80}, false);
+        chassis.moveToPoint(-25.5, 16, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.turnToHeading(179, 750, {.maxSpeed=80}, false);
+        chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+        chassis.moveToPoint(-25.5, 37, 100000, {.forwards=false, .maxSpeed=80}, false);
     } else if (auton == 6) { // Skills
-        // BR ML
-        chassis.moveToPoint(0, 35.5, 1500, {.maxSpeed=80}, false);
+        // Bottom Right Match Load
+        chassis.moveToPoint(0, 35.6, 1500, {.maxSpeed=80}, false);
         tongue.extend();
         chassis.turnToHeading(90, 750, {.maxSpeed=80}, false);
         in();
-        chassis.moveToPoint(13.3, 36, 7000, {.maxSpeed=80}, false);
-
-        // TR LG 
-        reset();
-        chassis.moveToPoint(-21, 48, 2000, {.forwards=false, .maxSpeed=80}, false);
-        chassis.turnToHeading(86, 750, {.maxSpeed=80}, false);
-        chassis.moveToPoint(-71, 48, 2500, {.forwards=false, .maxSpeed=80}, false);
-        chassis.moveToPoint(-90, 33, 1500, {.forwards=false, .maxSpeed=80}, false);  
-        chassis.turnToHeading(-90, 750, {.maxSpeed=80}, false);
-        chassis.moveToPoint(-70, 35, 1000, {.forwards=false, .maxSpeed=80}, false);
-        chassis.tank(-50, -50);
-        out(100);
-        goal();
-        pros::delay(3000);
-        in();
-
-        // TR ML
-        chassis.moveToPoint(-118, 33.75, 6000, {.maxSpeed=60}, false);
-
-        // TR LG
-        chassis.moveToPoint(-70, 35, 1500, {.forwards=false, .maxSpeed=80}, false);
-        chassis.tank(-50, -50);
-        out(100);
-        goal();
-        pros::delay(3000);
+        chassis.moveToPoint(13.3, 36, 1000, {.maxSpeed=80}, false);
+        pros::delay(1000);
+        drive(-50, 100);
+        pros::delay(250);
         drive(50, 500);
+        pros::delay(500);
+
+        // Right Alley
+        chassis.moveToPoint(0, 36, 1000, {.forwards=false, .maxSpeed=80}, false);
+        tongue.retract();
+        chassis.turnToHeading(-35, 750, {}, false);
+        chassis.moveToPoint(-11.5, 43.5, 1000, {.minSpeed=80, .earlyExitRange=8});
+        chassis.moveToPose(-29, 48, -90, 1500); chassis.waitUntilDone();
+        chassis.moveToPoint(-78, 47, 2000, {.maxSpeed=80}, false);
+
+        // Right Goal 1
+        chassis.moveToPoint(-100, 31, 1500, {.maxSpeed=80}, false);
+        chassis.turnToHeading(-90, 750, {.maxSpeed=80}, false);
+        chassis.moveToPoint(-70, 33.8, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.tank(-50, -50);
+        out(200);
+        goal(3000);
+        tongue.extend();
+        in();
+        chassis.turnToHeading(-90, 500, {}, false);
+        chassis.setPose(-80, 34, (float)imu.get_heading());
+        
+        // Top Right Match Load
+        chassis.moveToPoint(-115, 32.3, 2000, {.maxSpeed=60}, false);
+        pros::delay(1000);
+        drive(-50, 100);
+        pros::delay(250);
+        drive(50, 500);
+        pros::delay(500);
+
+        // Right Goal 2
+        chassis.moveToPoint(-70, 34.5, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.tank(-50, -50);
+        out(150);
+        goal(3000);
+        tongue.extend();
+        reset();
+        chassis.setPose(-80, 34, (float)imu.get_heading());
+        pros::delay(500);
+
+        // Top Left Match Load
+        chassis.moveToPoint(-95, 34, 1000, {.maxSpeed=80}, false);
+        chassis.turnToHeading(-180, 750, {.maxSpeed=80}, false);
+        chassis.moveToPoint(-93, -67, 3500, {.maxSpeed=80}, false);
+        chassis.turnToHeading(-100, 500, {.maxSpeed=80}, false);
+        in();
+        chassis.moveToPoint(-119, -67, 1000, {.maxSpeed=60}, false);
+        pros::delay(1000);
+        drive(-50, 100);
+        pros::delay(250);
+        drive(50, 500);
+        pros::delay(500);
+        
+        // Left Alley
+        reset();
+        chassis.moveToPoint(-100, -67, 1000, {.forwards=false, .maxSpeed=80}, false);
+        tongue.retract();
+        chassis.turnToHeading(145, 750, {}, false);
+        chassis.moveToPoint(-88.5, -76, 1000, {.minSpeed=80, .earlyExitRange=8});
+        chassis.moveToPose(-71, -79.5, 90, 1500); chassis.waitUntilDone();
+        chassis.moveToPoint(-22, -78, 2000, {.maxSpeed=80}, false);
+
+        // Left Goal 1
+        chassis.moveToPoint(0, -63.5, 1500, {.maxSpeed=80}, false);
+        chassis.turnToHeading(90, 750, {.maxSpeed=80}, false);
+        chassis.moveToPoint(-25, -64.2, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.tank(-50, -50);
+        out(200);
+        goal(3000);
+        tongue.extend();
+        reset();
+        in();
+        chassis.turnToHeading(90, 500, {}, false);
+        chassis.setPose(-20, -64, (float)imu.get_heading());
+        
+        // Bottom Left Match Load
+        chassis.moveToPoint(15, -63, 2000, {.maxSpeed=60}, false);
+        pros::delay(1000);
+        drive(-50, 100);
+        pros::delay(250);
+        drive(50, 500);
+        pros::delay(500);
+
+        // Left Goal 2
+        chassis.moveToPoint(-25, -63.6, 1000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.tank(-50, -50);
+        out(200);
+        goal(3000);
+        tongue.retract();
+        wing.extend();
+        pros::delay(1000);
+        chassis.setPose(0, 0, 0);
+
+        // Park
+        chassis.moveToPoint(0, 13, 750, {.maxSpeed=80}, false);
+        chassis.moveToPoint(-15, 31, 1000, {.minSpeed=100, .earlyExitRange=4});
+        chassis.moveToPose(-33, 36, -84, 1500); chassis.waitUntilDone();
+        tongue.extend();
+        pros::delay(500);
+        drive(127, 550);
+        drive(-100, 200);
+        tongue.retract();
+    } else if (auton == 7) { // Get Carried
+        drive(50, 150);
     }
 }
 
 void opcontrol() {
     pros::Controller controller(pros::E_CONTROLLER_MASTER);
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     
     while (true) {
         chassis.tank(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
