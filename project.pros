@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "NE Wisco",
+    "project_name": "Great Lakes 3",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -636,7 +636,7 @@
     },
     "upload_options": {
       "description": " ",
-      "icon": "ufo",
+      "icon": "power",
       "after": "none"
     },
     "use_early_access": false
