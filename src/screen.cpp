@@ -3,6 +3,7 @@
 lv_obj_t *lx, *ly, *lt;
 lv_obj_t *dl, *dr, *db;
 lv_obj_t *curr, *desc, *next, *prev, *lnext, *lprev;
+lv_obj_t *bmode, *lmode;
 lv_obj_t *sto, *sti, *stdist, *stm;
 
 void nextAuton(lv_event_t* e) {
@@ -15,6 +16,12 @@ void prevAuton(lv_event_t* e) {
     auton = (auton + total - 2) % total + 1; 
     lv_label_set_text_fmt(curr, "Selected Auton: %d", auton); 
     lv_label_set_text(desc, descriptions[auton - 1]);
+}
+
+void switchMode(lv_event_t* e) {
+    skills = !skills;
+    lv_obj_set_style_bg_color(bmode, skills ? lv_color_hex(0x6495ED) : lv_color_hex(0xED2939), 0);
+    lv_label_set_text_fmt(lmode, "Mode: %s", skills ? "Skills" : "Match");
 }
 
 void createDisplay(lv_obj_t* screen) {
@@ -38,9 +45,11 @@ void createDisplay(lv_obj_t* screen) {
 
     curr = lv_label_create(screen); 
     lv_obj_align(curr, LV_ALIGN_TOP_RIGHT, -20, 20);
+    lv_label_set_text_fmt(curr, "Selected Auton: %d", auton); 
 
     desc = lv_label_create(screen); 
     lv_obj_align(desc, LV_ALIGN_TOP_RIGHT, -20, 50);
+    lv_label_set_text(desc, descriptions[auton - 1]);
 
     next = lv_button_create(screen);  
     lv_obj_align(next, LV_ALIGN_TOP_RIGHT, -20, 80); 
@@ -58,8 +67,13 @@ void createDisplay(lv_obj_t* screen) {
     lprev = lv_label_create(prev); 
     lv_label_set_text(lprev, "<");
 
-    lv_label_set_text_fmt(curr, "Selected Auton: %d", auton); 
-    lv_label_set_text(desc, descriptions[auton - 1]);
+    bmode = lv_button_create(screen);
+    lv_obj_align(bmode, LV_ALIGN_CENTER, 0, 30);
+    lv_obj_set_style_bg_color(bmode, skills ? lv_color_hex(0x6495ED) : lv_color_hex(0xED2939), 0);
+    lv_obj_add_event_cb(bmode, switchMode, LV_EVENT_SHORT_CLICKED, nullptr);
+
+    lmode = lv_label_create(bmode);
+    lv_label_set_text_fmt(lmode, "Mode: %s", skills ? "Skills" : "Match");
 
     sto = lv_label_create(screen);
     lv_obj_align(sto, LV_ALIGN_TOP_RIGHT, -20, 150);

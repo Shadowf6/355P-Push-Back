@@ -1,16 +1,20 @@
 #pragma once
 
-inline int auton = 5;
+inline int auton = 2;
 inline bool skills = false;
 
-inline int startingSpeed = 9;
-inline int maxSpeed = 12;
+inline int startingSpeed = 10;
+inline int maxSpeed = 10;
 
-inline int total = 5;
+inline int total = 9;
 inline char* descriptions[] = {
                                "7 Right", // 1
                                "7 Left", // 2
-                               "Left Split", // 3
-                               "Solo AWP", // 4
-                               "Skills" // 5
+                               "4 Right", // 3
+                               "4 Left", // 4
+                               "Solo AWP (push)", // 5
+                               "Solo AWP (no push)", // 6
+                               "Skills", // 7
+                               "Get Carried", // 8
+                               "Do Nothing", // 9
                                };
