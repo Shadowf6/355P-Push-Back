@@ -637,7 +637,8 @@
     "upload_options": {
       "description": " ",
       "icon": "X",
-      "after": "none"
+      "after": "none",
+      "slot": 1
     },
     "use_early_access": false
   }

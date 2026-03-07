@@ -19,7 +19,7 @@ class Odometry {
 
         pose p {0.0f, 0.0f, 0.0f};
 
-        float offsetX = 1.0f;
+        float offsetX = 0.5f;
         float offsetY = -0.5f;
 
         float lastX = 0.0f;

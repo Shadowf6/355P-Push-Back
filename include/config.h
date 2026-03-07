@@ -1,10 +1,10 @@
 #pragma once
 
-inline int auton = 2;
-inline bool skills = false;
+inline int auton = 5;
+inline bool skills = true;
 
 inline int startingSpeed = 10;
-inline int maxSpeed = 10;
+inline int maxSpeed = 12;
 
 inline int total = 9;
 inline char* descriptions[] = {

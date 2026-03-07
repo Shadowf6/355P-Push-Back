@@ -68,7 +68,7 @@ void createDisplay(lv_obj_t* screen) {
     lv_label_set_text(lprev, "<");
 
     bmode = lv_button_create(screen);
-    lv_obj_align(bmode, LV_ALIGN_CENTER, 0, 30);
+    lv_obj_align(bmode, LV_ALIGN_CENTER, 0, -50);
     lv_obj_set_style_bg_color(bmode, skills ? lv_color_hex(0x6495ED) : lv_color_hex(0xED2939), 0);
     lv_obj_add_event_cb(bmode, switchMode, LV_EVENT_SHORT_CLICKED, nullptr);
 
