@@ -106,12 +106,14 @@ void autonomous() {
         
         // Match Load
         chassis.turnToHeading(142, 500, {}, false);
-        chassis.moveToPoint(37.5, 2, 1250, {.maxSpeed=100}, false);
+        reset();
+        chassis.moveToPoint(36.75, 2, 750, {.maxSpeed=100}, false);
         chassis.turnToHeading(180, 500, {}, false);
-        chassis.moveToPoint(37.5, -17, 800, {.maxSpeed=70}, false);
+        in();
+        chassis.moveToPoint(37.5, -19, 1000, {.maxSpeed=70}, false);
         
         // Goal
-        chassis.moveToPoint(38, 30, 800, {.forwards=false, .maxSpeed=80}, false);
+        chassis.moveToPoint(37.5, 30, 800, {.forwards=false, .maxSpeed=80}, false);
         chassis.tank(-50, -50);
         out(200); goal(2000);
         tongue.retract(); 
@@ -127,18 +129,21 @@ void autonomous() {
         // Corner
         in();
         chassis.moveToPoint(-12, 26, 800, {.maxSpeed=80});
-        wing.extend(); pros::delay(250); wing.retract(); pros::delay(500); 
+        pros::delay(750); 
         tongue.extend(); 
         chassis.waitUntilDone();
         
         // Match Load
         chassis.turnToHeading(-142, 500, {}, false);
-        chassis.moveToPoint(-38, 2, 1250, {.maxSpeed=100}, false);
+        reset();
+        chassis.moveToPoint(-38, 2, 750, {.maxSpeed=100}, false);
         chassis.turnToHeading(-180, 500, {}, false);
-        chassis.moveToPoint(-38, -17.5, 800, {.maxSpeed=70}, false);
+        in();
+        chassis.moveToPoint(-37.5, -17.5, 1000, {.maxSpeed=70}, false);
         
         // Goal
-        chassis.moveToPoint(-38.5, 30, 800, {.forwards=false, .maxSpeed=80}, false);
+        chassis.moveToPoint(-38, 30, 800, {.forwards=false, .maxSpeed=80});
+        wing.extend(); pros::delay(250); wing.retract(); chassis.waitUntilDone();
         chassis.tank(-50, -50);
         out(200); goal(2000);
         tongue.retract(); 
@@ -149,7 +154,7 @@ void autonomous() {
         chassis.moveToPoint(-27.25, 16, 750, {.forwards=false, .maxSpeed=80}, false);
         chassis.turnToHeading(-180, 500, {}, false);
         chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-        chassis.moveToPoint(-27.25, 37, 100000, {.forwards=false, .maxSpeed=80}, false);
+        chassis.moveToPoint(-27.25, 40, 100000, {.forwards=false, .maxSpeed=80}, false);
     } else if (auton == 3) { // 4 Right
         // Corner
         in();
@@ -197,14 +202,14 @@ void autonomous() {
     } else if (auton == 5) { // Solo AWP (push)
         // Match Load
         chassis.moveToPoint(0, -50, 300, {.forwards=false});
-        chassis.moveToPoint(0, 45, 1400, {.maxSpeed=100}, false);
+        chassis.moveToPoint(0, 47.5, 1400, {.maxSpeed=100}, false);
         tongue.extend();
         chassis.turnToHeading(80, 500, {}, false);
         in();
-        chassis.moveToPoint(14, 45.5, 900, {}, false);
+        chassis.moveToPoint(14, 47.5, 900, {}, false);
         
         // Long Goal
-        chassis.moveToPoint(-45, 45.5, 750, {.forwards=false, .maxSpeed=80}, false);
+        chassis.moveToPoint(-45, 47.5, 750, {.forwards=false, .maxSpeed=80}, false);
         chassis.tank(-50, -50); 
         intake.move(127);
         score.move(127);
@@ -240,24 +245,24 @@ void autonomous() {
         in();
         
         // Match Load
-        chassis.moveToPoint(-21, -63, 1250, {.maxSpeed=100}, false);
+        chassis.moveToPoint(-21, -61, 1250, {.maxSpeed=100}, false);
         chassis.turnToHeading(90, 400, {}, false);
-        chassis.moveToPoint(10, -63, 750, {.maxSpeed=70}, false);
+        chassis.moveToPoint(10, -61, 750, {.maxSpeed=70}, false);
         
         // Long Goal
-        chassis.moveToPoint(-50, -65.5, 750, {.forwards=false, .maxSpeed=80}, false);
+        chassis.moveToPoint(-50, -63.5, 750, {.forwards=false, .maxSpeed=80}, false);
         chassis.tank(-50, -50);
         score.move(127);
     } else if (auton == 6) { // Solo AWP (no push)
         // Match Load
-        chassis.moveToPoint(0, 45, 1400, {.maxSpeed=100}, false);
+        chassis.moveToPoint(0, 47.5, 1400, {.maxSpeed=100}, false);
         tongue.extend();
         chassis.turnToHeading(80, 500, {}, false);
         in();
-        chassis.moveToPoint(14, 45.5, 900, {}, false);
+        chassis.moveToPoint(14, 47.5, 900, {}, false);
         
         // Long Goal
-        chassis.moveToPoint(-45, 45.5, 750, {.forwards=false, .maxSpeed=80}, false);
+        chassis.moveToPoint(-45, 47.5, 750, {.forwards=false, .maxSpeed=80}, false);
         chassis.tank(-50, -50); 
         intake.move(127);
         score.move(127);
@@ -293,12 +298,12 @@ void autonomous() {
         in();
         
         // Match Load
-        chassis.moveToPoint(-21, -63, 1250, {.maxSpeed=100}, false);
+        chassis.moveToPoint(-21, -61, 1250, {.maxSpeed=100}, false);
         chassis.turnToHeading(90, 400, {}, false);
-        chassis.moveToPoint(10, -63, 750, {.maxSpeed=70}, false);
+        chassis.moveToPoint(10, -61, 750, {.maxSpeed=70}, false);
         
         // Long Goal
-        chassis.moveToPoint(-50, -65.5, 750, {.forwards=false, .maxSpeed=80}, false);
+        chassis.moveToPoint(-50, -63.5, 750, {.forwards=false, .maxSpeed=80}, false);
         chassis.tank(-50, -50);
         score.move(127);
     } else if (auton == 7) { // Skills
