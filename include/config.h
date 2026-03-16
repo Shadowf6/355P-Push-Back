@@ -1,9 +1,9 @@
 #pragma once
 
-inline int auton = 2;
+inline int auton = 1;
 inline bool skills = false;
 
-inline int startingSpeed = 10;
+inline int startingSpeed = 12;
 inline int maxSpeed = 12;
 
 inline int total = 9;
