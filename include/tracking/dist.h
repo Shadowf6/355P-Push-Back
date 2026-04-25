@@ -31,7 +31,7 @@ class Distance {
         }
 
         std::pair<float, float> getDist(float theta) {
-            float x = 9999, y = 9999;
+            float x = 9999.0f, y = 9999.0f;
 
             float sinT = sinf(rad(theta));
             float cosT = cosf(rad(theta));
